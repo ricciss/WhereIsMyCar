@@ -19,7 +19,7 @@ public class GameObjectScript : MonoBehaviour
 
     [HideInInspector]
     public bool inRightPlace = false;
-    public static GameObjectScript lastDraged = null;
+    public static GameObject lastDragged = null;
     public static bool isDragging = false;
 
     void Awake()
