@@ -77,7 +77,7 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
                         case "Traktors5":
                             gameObjectScript.carSoundSource.PlayOneShot(gameObjectScript.sounds[12]);
                             break;
-                        case "FireTruck":
+                        case "Fire":
                             gameObjectScript.carSoundSource.PlayOneShot(gameObjectScript.sounds[13]);
                             break;
 
@@ -133,7 +133,7 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
                     case "Traktors5":
                         gameObjectScript.traktors5.GetComponent<RectTransform>().localPosition = gameObjectScript.traktors5Coord;
                         break;
-                    case "FireTruck":
+                    case "Fire":
                         gameObjectScript.fireTruck.GetComponent<RectTransform>().localPosition = gameObjectScript.fireTruckCoord;
                         break;
 
