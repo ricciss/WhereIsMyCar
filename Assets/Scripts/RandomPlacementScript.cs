@@ -12,10 +12,34 @@ public class RandomPlacementScript : MonoBehaviour
     public RectTransform[] dropPlaces;          // 12 objekti ar DropPlaceScript
     public RectTransform[] dropSpawnPoints;     // 17 iespējamie punkti
 
+    [Header("Spoguļattēls (mirror)")]
+    [Range(0f, 1f)]
+    [Tooltip("Varbūtība (0 = nekad, 1 = vienmēr), ka katra mašīna sākotnēji tiks novietota spoguļattēlā. Spēlētājs to var apgriezt atpakaļ ar Space, velkot mašīnu.")]
+    public float mirrorChance = 0.4f;
+
     void Awake()
     {
         RandomizePositions(cars, carSpawnPoints);
         RandomizePositions(dropPlaces, dropSpawnPoints);
+        RandomizeMirroring(cars);
+    }
+
+    // Tikai mašīnām (ne Drop Places) - katrai neatkarīgi ar mirrorChance
+    // varbūtību apgriež x mērogu uz negatīvu, tieši tāpat kā to dara
+    // Space taustiņš ObjectTransformationScript.cs skriptā vilkšanas laikā.
+    void RandomizeMirroring(RectTransform[] objects)
+    {
+        foreach (RectTransform obj in objects)
+        {
+            if (obj == null) continue;
+
+            if (Random.value < mirrorChance)
+            {
+                Vector3 scale = obj.localScale;
+                scale.x *= -1;
+                obj.localScale = scale;
+            }
+        }
     }
 
     void RandomizePositions(RectTransform[] objects, RectTransform[] points)

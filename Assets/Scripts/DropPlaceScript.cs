@@ -8,15 +8,17 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
     private Vector3 placeSize, carSize;
     private float xSizeDiff, ySizeDiff;
     public GameObjectScript gameObjectScript;
+    public GameManagerScript gameManagerScript;
 
     void Awake()
     {
         gameObjectScript = Object.FindFirstObjectByType<GameObjectScript>();
+        gameManagerScript = Object.FindFirstObjectByType<GameManagerScript>();
     }
 
     public void OnDrop(PointerEventData eventData)
     {
-        if((eventData.pointerDrag != null) && Input.GetMouseButtonUp(0) && (!Input.GetMouseButton(2))) 
+        if ((eventData.pointerDrag != null) && Input.GetMouseButtonUp(0) && (!Input.GetMouseButton(2)))
         {
             if (eventData.pointerDrag.tag.Equals(tag))
             {
@@ -32,10 +34,14 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
                 Debug.Log("Diff X Size: " + xSizeDiff);
                 Debug.Log("Diff Y Size: " + ySizeDiff);
 
-                if((diffZRot <= 7 || (diffZRot >=353 && diffZRot <=360)) && (xSizeDiff <= 0.1f && ySizeDiff <= 0.1f))
+                if ((diffZRot <= 7 || (diffZRot >= 353 && diffZRot <= 360)) && (xSizeDiff <= 0.1f && ySizeDiff <= 0.1f))
                 {
                     Debug.Log("Car placed correctly!");
                     gameObjectScript.inRightPlace = true;
+
+                    if (gameManagerScript != null)
+                        gameManagerScript.RegisterCorrectPlacement(GetComponent<RectTransform>());
+
                     eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
                     eventData.pointerDrag.GetComponent<RectTransform>().localScale = GetComponent<RectTransform>().localScale;
                     eventData.pointerDrag.GetComponent<RectTransform>().localRotation = GetComponent<RectTransform>().localRotation;
@@ -91,7 +97,8 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
 
                 }
 
-            } else
+            }
+            else
             {
                 gameObjectScript.inRightPlace = false;
                 gameObjectScript.carSoundSource.PlayOneShot(gameObjectScript.sounds[4]);
@@ -145,5 +152,5 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
             }
         }
     }
-    
+
 }
