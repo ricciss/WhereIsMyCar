@@ -4194,7 +4194,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1202216003
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4259,7 +4259,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!223 &1202216006
 Canvas:
   m_ObjectHideFlags: 0
@@ -4295,6 +4295,7 @@ GameObject:
   - component: {fileID: 1214296379}
   - component: {fileID: 1214296378}
   - component: {fileID: 1214296380}
+  - component: {fileID: 1214296381}
   m_Layer: 5
   m_Name: Person1
   m_TagString: Untagged
@@ -4311,14 +4312,14 @@ RectTransform:
   m_GameObject: {fileID: 1214296375}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 70902450}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 61, y: -423}
+  m_AnchoredPosition: {x: 377, y: 332}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1214296378
@@ -4381,6 +4382,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1214296381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214296375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36381049cff962f4aac6f7fb7618bdb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkDistance: 150
+  speed: 40
+  direction: {x: 1, y: 0}
+  pauseAtEnds: 0.5
+  flipSpriteWhenTurning: 1
 --- !u!1 &1214494146
 GameObject:
   m_ObjectHideFlags: 0
@@ -5624,6 +5642,7 @@ GameObject:
   - component: {fileID: 1444837796}
   - component: {fileID: 1444837795}
   - component: {fileID: 1444837794}
+  - component: {fileID: 1444837797}
   m_Layer: 5
   m_Name: Person2
   m_TagString: Untagged
@@ -5640,14 +5659,14 @@ RectTransform:
   m_GameObject: {fileID: 1444837792}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 70902450}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 888, y: -247}
+  m_AnchoredPosition: {x: 158, y: -348}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1444837794
@@ -5710,6 +5729,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1444837792}
   m_CullTransparentMesh: 1
+--- !u!114 &1444837797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444837792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36381049cff962f4aac6f7fb7618bdb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkDistance: 150
+  speed: 40
+  direction: {x: 1, y: 0}
+  pauseAtEnds: 0.5
+  flipSpriteWhenTurning: 1
 --- !u!1 &1452170428
 GameObject:
   m_ObjectHideFlags: 0

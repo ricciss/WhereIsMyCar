@@ -174,8 +174,26 @@ public class GameManagerScript : MonoBehaviour
 
         ShowStars(finalStars);
 
-        if (victoryPanel != null) victoryPanel.SetActive(true);
+        ShowPanelOnTop(victoryPanel);
         FreezeGame();
+    }
+
+    // Parāda paneli un nodrošina, ka tas zīmējas VIRS visa (mašīnām, mākoņiem, HUD)
+    void ShowPanelOnTop(GameObject panel)
+    {
+        if (panel == null) return;
+
+        panel.SetActive(true);
+        panel.transform.SetAsLastSibling();
+
+        Canvas canvas = panel.GetComponent<Canvas>();
+        if (canvas == null) canvas = panel.AddComponent<Canvas>();
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = 100;
+
+        // Bez šī pogas panelī (RESTART/RETURN) nereaģētu uz klikšķiem
+        if (panel.GetComponent<GraphicRaycaster>() == null)
+            panel.AddComponent<GraphicRaycaster>();
     }
 
     // Iesaldē visu spēli (lidojošie objekti, animācijas) un bloķē vilkšanu
@@ -215,7 +233,7 @@ public class GameManagerScript : MonoBehaviour
     void GameOver()
     {
         timerRunning = false;
-        if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        ShowPanelOnTop(gameOverPanel);
         FreezeGame();
     }
 
