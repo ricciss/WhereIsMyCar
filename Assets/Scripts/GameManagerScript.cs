@@ -41,6 +41,13 @@ public class GameManagerScript : MonoBehaviour
     [Tooltip("Atstāj tukšu, lai pārlādētu pašreizējo ainu")]
     public string sceneNameToReload = "";
 
+    [Header("Atgriešanās uz sākuma ainu")]
+    [Tooltip("Sākuma ainas nosaukums (jābūt Build Settings sarakstā)")]
+    public string mainMenuSceneName = "MainMenu";
+
+    // true, kad spēle beigusies (uzvara vai zaudējums) - citi skripti pēc tā bloķē vilkšanu
+    public static bool isGameOver = false;
+
     private float elapsedTime = 0f;
     private bool timerRunning = true;
     private int correctlyPlaced = 0;
@@ -52,6 +59,10 @@ public class GameManagerScript : MonoBehaviour
 
     void Awake()
     {
+        // Sākam ar "atsaldētu" spēli (pēc restarta timeScale varētu būt palicis 0)
+        isGameOver = false;
+        Time.timeScale = 1f;
+
         livesRemaining = startingLives;
 
         if (victoryPanel != null) victoryPanel.SetActive(false);
@@ -62,6 +73,13 @@ public class GameManagerScript : MonoBehaviour
 
     void Update()
     {
+        // Esc atgriež uz sākuma ainu jebkurā brīdī (arī spēles laikā)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ReturnToMainMenu();
+            return;
+        }
+
         if (!timerRunning) return;
 
         elapsedTime += Time.deltaTime;
@@ -157,6 +175,14 @@ public class GameManagerScript : MonoBehaviour
         ShowStars(finalStars);
 
         if (victoryPanel != null) victoryPanel.SetActive(true);
+        FreezeGame();
+    }
+
+    // Iesaldē visu spēli (lidojošie objekti, animācijas) un bloķē vilkšanu
+    void FreezeGame()
+    {
+        isGameOver = true;
+        Time.timeScale = 0f;
     }
 
     string FormatTime(float time)
@@ -190,20 +216,32 @@ public class GameManagerScript : MonoBehaviour
     {
         timerRunning = false;
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        FreezeGame();
     }
 
     /// <summary>Piesaisti "Spēlēt vēlreiz" pogas OnClick() notikumam.</summary>
     public void RestartGame()
     {
+        Time.timeScale = 1f;
         if (string.IsNullOrEmpty(sceneNameToReload))
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         else
             SceneManager.LoadScene(sceneNameToReload);
     }
 
+    /// <summary>
+    /// Piesaisti pogai (arī spēles laikā redzamajai) - izmanto mainMenuSceneName lauku.
+    /// </summary>
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
     /// <summary>Piesaisti "Uz sākuma ainu" pogas OnClick() notikumam (ievadi ainas nosaukumu).</summary>
     public void GoToMainMenu(string mainMenuSceneName)
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(mainMenuSceneName);
     }
 }

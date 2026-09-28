@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -7,11 +7,13 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
     public ScreenBoundriesScript screenBoundriesScript;
+    private FlyingObjectSpawnScript flyingSpawnScript;
 
     void Awake()
     {
+        flyingSpawnScript = Object.FindFirstObjectByType<FlyingObjectSpawnScript>();
         canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null )
+        if (canvasGroup == null)
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
@@ -22,7 +24,9 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        if(Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
+        if (GameManagerScript.isGameOver) return;
+
+        if (Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
             Debug.Log("Left mouse button clicked on " + gameObject.name);
             gameObjectScript.carSoundSource.PlayOneShot(gameObjectScript.sounds[0]);
@@ -31,7 +35,9 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-       if(Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
+        if (GameManagerScript.isGameOver) return;
+
+        if (Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
             GameObjectScript.isDragging = true;
             canvasGroup.alpha = 0.6f;
@@ -39,6 +45,13 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
             int lastIndex = transform.parent.childCount - 1;
             int positionIndex = Mathf.Max(0, lastIndex);
             transform.SetSiblingIndex(positionIndex);
+
+            // Mākoņiem/lidmašīnām jāpaliek VIRS mašīnām (arī vilktajai)
+            if (flyingSpawnScript != null && flyingSpawnScript.spawnPoint != null
+                && flyingSpawnScript.spawnPoint.parent == transform.parent)
+            {
+                flyingSpawnScript.spawnPoint.SetAsLastSibling();
+            }
 
             Vector3 cursorWorldPos = Camera.main.ScreenToWorldPoint(new Vector3(
                 Input.mousePosition.x, Input.mousePosition.y, screenBoundriesScript.screenPoint.z));
@@ -54,6 +67,8 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (GameManagerScript.isGameOver) return;
+
         if (Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
             Vector3 cursScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenBoundriesScript.screenPoint.z);
@@ -64,7 +79,7 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     }
 
     public void OnEndDrag(PointerEventData eventData)
-    { 
+    {
         if (Input.GetMouseButtonUp(0))
         {
             GameObjectScript.isDragging = false;
@@ -85,12 +100,12 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

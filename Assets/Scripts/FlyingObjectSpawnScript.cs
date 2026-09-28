@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FlyingObjectSpawnScript : MonoBehaviour
 {
@@ -29,6 +29,10 @@ public class FlyingObjectSpawnScript : MonoBehaviour
     void Start()
     {
         screenBoundriesScript = Object.FindFirstObjectByType<ScreenBoundriesScript>();
+
+        // Lidojošie objekti jāzīmē virs visa pārējā (mašīnām, vietām)
+        spawnPoint.SetAsLastSibling();
+
         minY = screenBoundriesScript.minY;
         maxY = screenBoundriesScript.maxY;
         InvokeRepeating(nameof(SpawnCloud), 0f, cloudSpawnInterval);
