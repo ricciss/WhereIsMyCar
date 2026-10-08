@@ -33,8 +33,8 @@ public class FlyingObjectSpawnScript : MonoBehaviour
         // Lidojošie objekti jāzīmē virs visa pārējā (mašīnām, vietām)
         spawnPoint.SetAsLastSibling();
 
-        minY = screenBoundriesScript.minY;
-        maxY = screenBoundriesScript.maxY;
+        minY = screenBoundriesScript.worldBounds.yMin;
+        maxY = screenBoundriesScript.worldBounds.yMax;
         InvokeRepeating(nameof(SpawnCloud), 0f, cloudSpawnInterval);
         InvokeRepeating(nameof(SpawnPlain), 0f, plainSpawnInterval);
     }

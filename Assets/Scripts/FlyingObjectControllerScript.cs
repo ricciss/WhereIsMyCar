@@ -59,27 +59,36 @@ public class FlyingObjectControllerScript : MonoBehaviour
         rectTransform.anchoredPosition +=
             new Vector2(-speed * Time.deltaTime, waveOffset * Time.deltaTime);
 
-        if (speed > 0 && transform.position.x < (screenBoundriesScript.minX + 80) && !isFadingOut)
+        if (speed > 0 && transform.position.x < (screenBoundriesScript.worldBounds.xMin + 80) && !isFadingOut)
         {
             StartCoroutine(FadeOutAndDestroy());
             isFadingOut = true;
         }
 
-        if (speed < 0 && transform.position.x > (screenBoundriesScript.maxX - 80) && !isFadingOut)
+        if (speed < 0 && transform.position.x > (screenBoundriesScript.worldBounds.xMax - 80) && !isFadingOut)
         {
             StartCoroutine(FadeOutAndDestroy());
             isFadingOut = true;
         }
+
+        //For Android
+
+        Vector2 inputPosition;
+        if (!TryGetInputPosition(out inputPosition))
+            return;
+
+        if (inputPosition.x < 0 || inputPosition.x > Screen.width || inputPosition.y < 0 || inputPosition.y > Screen.height || Camera.main == null)
+            return;
 
         if (CompareTag("Bomb") && !IsExploading &&
-            RectTransformUtility.RectangleContainsScreenPoint(rectTransform, Input.mousePosition, Camera.main))
+            RectTransformUtility.RectangleContainsScreenPoint(rectTransform, inputPosition, Camera.main))
         {
             Debug.Log("THe cursor collided with a bomb!");
             TriggerExplosion();
         }
 
         if (GameObjectScript.isDragging && !isFadingOut && RectTransformUtility.RectangleContainsScreenPoint(
-            rectTransform, Input.mousePosition, Camera.main))
+            rectTransform, inputPosition, Camera.main))
         {
             Debug.Log("The cursor collided with a flying object!");
             if (GameObjectScript.lastDragged != null)
@@ -99,6 +108,23 @@ public class FlyingObjectControllerScript : MonoBehaviour
             else
                 StartAndDestroy(Color.cyan);
         }
+    }
+
+    bool TryGetInputPosition(out Vector2 inputPosition)
+    {
+#if UNITY_EDITOR || UNITY_STANDALONE
+        inputPosition = Input.mousePosition;
+        return true;
+#elif UNITY_ANDROID
+    if(Input.touchCount > 0){
+        inputPosition = Input.GetTouch(0).position;
+        return ture;
+
+    } else {
+        inputPosition = Vector2.zero;
+        return false;
+    }
+#endif
     }
 
     IEnumerator ShrinkAndDestroy(GameObject obj, float duration)
@@ -154,6 +180,10 @@ public class FlyingObjectControllerScript : MonoBehaviour
 
     IEnumerator Vibrate()
     {
+#if UNITY_ANDROID
+        Handheld.Vibrate();
+#endif
+
         Vector2 originalPos = rectTransform.anchoredPosition;
         float duration = 0.4f;
         float elapsed = 0f;
