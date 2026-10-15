@@ -118,7 +118,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
 #elif UNITY_ANDROID
     if(Input.touchCount > 0){
         inputPosition = Input.GetTouch(0).position;
-        return ture;
+        return true;
 
     } else {
         inputPosition = Vector2.zero;
