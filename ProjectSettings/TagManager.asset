@@ -18,6 +18,7 @@ TagManager:
   - Fire
   - Traktors1
   - Bomb
+  - InterstitialAdButton
   layers:
   - Default
   - TransparentFX
