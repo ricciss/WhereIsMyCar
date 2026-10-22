@@ -21,12 +21,12 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
-        if(gameObjectScript == null)
+        if (gameObjectScript == null)
         {
-            gameObjectScript = Object. FindFirstObjectByType<GameObjectScript>();
+            gameObjectScript = Object.FindFirstObjectByType<GameObjectScript>();
         }
 
-        if(screenBoundriesScript == null)
+        if (screenBoundriesScript == null)
         {
             screenBoundriesScript = Object.FindFirstObjectByType<ScreenBoundriesScript>();
         }
@@ -35,17 +35,20 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
         if (canvas != null)
         {
             mainCamera = canvas.worldCamera;
-        } else
+        }
+        else
             Debug.LogWarning("Canvas not found in parent hierarchy of" + gameObject.name);
 
 
-       
+
     }
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (GameManagerScript.isGameOver) return;
+
         Debug.Log("Clicked on " + gameObject.name);
 
-        if(gameObjectScript.carSoundSource != null && gameObjectScript.sounds != null)
+        if (gameObjectScript.carSoundSource != null && gameObjectScript.sounds != null)
         {
             gameObjectScript.carSoundSource.PlayOneShot(gameObjectScript.sounds[0]);
         }
@@ -63,12 +66,12 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
         int positionIndex = Mathf.Max(0, lastIndex);
         transform.SetSiblingIndex(positionIndex);
 
-            // Mākoņiem/lidmašīnām jāpaliek VIRS mašīnām (arī vilktajai)
-            if (flyingSpawnScript != null && flyingSpawnScript.spawnPoint != null
-                && flyingSpawnScript.spawnPoint.parent == transform.parent)
-            {
-                flyingSpawnScript.spawnPoint.SetAsLastSibling();
-            }
+        // Mākoņiem/lidmašīnām jāpaliek VIRS mašīnām (arī vilktajai)
+        if (flyingSpawnScript != null && flyingSpawnScript.spawnPoint != null
+            && flyingSpawnScript.spawnPoint.parent == transform.parent)
+        {
+            flyingSpawnScript.spawnPoint.SetAsLastSibling();
+        }
 
         Vector3 cursorWorldPos;
         if (ScreenToWorldPoint(eventData.position, out cursorWorldPos))
@@ -80,13 +83,13 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
             dragOffsetWorld = Vector3.zero;
         }
         GameObjectScript.lastDragged = eventData.pointerDrag;
-        
+
     }
 
     private bool ScreenToWorldPoint(Vector2 screenPosition, out Vector3 worldPosition)
     {
         worldPosition = Vector3.zero;
-        if(mainCamera == null)
+        if (mainCamera == null)
         {
             Debug.LogWarning("Main camera is not assigned.");
             return false;
@@ -100,12 +103,11 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnDrag(PointerEventData eventData)
     {
-
-
-        //if (GameManagerScript.isGameOver) return;
+        // Spēle beigusies - mašīnu vairs nevar kustināt (arī ja vilkšana sākās pirms tam)
+        if (GameManagerScript.isGameOver) return;
 
         Vector3 pointerWorld;
-        if(!ScreenToWorldPoint(eventData.position, out pointerWorld))
+        if (!ScreenToWorldPoint(eventData.position, out pointerWorld))
         {
             return;
         }
@@ -122,7 +124,16 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if(gameObjectScript.carSoundSource != null && gameObjectScript.sounds != null)
+        // Spēle beigusies vilkšanas laikā - tikai atjaunojam izskatu, bez skaņas un loģikas
+        if (GameManagerScript.isGameOver)
+        {
+            GameObjectScript.isDragging = false;
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = true;
+            return;
+        }
+
+        if (gameObjectScript.carSoundSource != null && gameObjectScript.sounds != null)
         {
 
             gameObjectScript.carSoundSource.PlayOneShot(gameObjectScript.sounds[0]);
@@ -141,5 +152,5 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
         }
     }
 
-   
+
 }

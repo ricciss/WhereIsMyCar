@@ -17,7 +17,7 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-        if (eventData.pointerDrag == null)
+        if (eventData.pointerDrag == null || GameManagerScript.isGameOver)
             return;
 
         RectTransform carRect = eventData.pointerDrag.GetComponent<RectTransform>();

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using System.Collections;
@@ -31,16 +31,16 @@ public class CameraZoomScript : MonoBehaviour
 
     void Awake()
     {
-        if(mainCamera == null)
+        if (mainCamera == null)
         {
             mainCamera = GetComponent<Camera>();
         }
 
-        if(screenBoundriesScript == null)
+        if (screenBoundriesScript == null)
         {
             screenBoundriesScript = FindFirstObjectByType<ScreenBoundriesScript>();
         }
-        
+
     }
 
     private void Start()
@@ -52,6 +52,14 @@ public class CameraZoomScript : MonoBehaviour
 
     void Update()
     {
+        // Spēle beigusies - kameru vairs nevar vilkt, tuvināt vai tālināt
+        if (GameManagerScript.isGameOver)
+        {
+            isTouchPan = false;
+            panFingerId = -1;
+            return;
+        }
+
         if (ObjectTransformationScript.isTransforming)
         {
             return;
@@ -79,7 +87,7 @@ public class CameraZoomScript : MonoBehaviour
     void DesktopFollowCursor()
     {
         Vector3 mousePos = Input.mousePosition;
-        if(mousePos.x < 0 || mousePos.x > Screen.width || mousePos.y < 0 || mousePos.y > Screen.height)
+        if (mousePos.x < 0 || mousePos.x > Screen.width || mousePos.y < 0 || mousePos.y > Screen.height)
         {
             return;
         }
@@ -93,8 +101,8 @@ public class CameraZoomScript : MonoBehaviour
 
     void HandleTouch()
     {
-        if(Input.touchCount != 1)
-        
+        if (Input.touchCount != 1)
+
             return;
 
         Touch touch = Input.GetTouch(0);
@@ -102,10 +110,10 @@ public class CameraZoomScript : MonoBehaviour
         if (isTouchUIButton(touch.position))
             return;
 
-        if(touch.phase == TouchPhase.Began)
+        if (touch.phase == TouchPhase.Began)
         {
             float dt = Time.time - lastTapTime;
-            if(dt <= doubleTapMaxDelay && Vector2.Distance(touch.position,lastTouchPos) <= doubleTapMaxDistance)
+            if (dt <= doubleTapMaxDelay && Vector2.Distance(touch.position, lastTouchPos) <= doubleTapMaxDistance)
             {
                 StartCoroutine(ResetZoomSmooth());
                 lastTapTime = 0f;
@@ -118,17 +126,19 @@ public class CameraZoomScript : MonoBehaviour
             lastTouchPos = touch.position;
             panFingerId = touch.fingerId;
             isTouchPan = true;
-        }else if (touch.phase == TouchPhase.Moved && isTouchPan && touch.fingerId == panFingerId)
+        }
+        else if (touch.phase == TouchPhase.Moved && isTouchPan && touch.fingerId == panFingerId)
         {
             Vector2 delta = touch.position - lastTouchPos;
             transform.Translate(ScreenDeltaToWorldDelta(delta) * touchPanSpeed, Space.World);
             lastTouchPos = touch.position;
-        }else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+        }
+        else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
         {
             isTouchPan = false;
             panFingerId = -1;
         }
-        
+
     }
 
     void HandlePinch()
@@ -150,9 +160,9 @@ public class CameraZoomScript : MonoBehaviour
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointerData, results);
 
-        foreach(RaycastResult result in results)
+        foreach (RaycastResult result in results)
         {
-            if(result.gameObject.GetComponent<UnityEngine.UI.Button>() != null)
+            if (result.gameObject.GetComponent<UnityEngine.UI.Button>() != null)
             {
                 return true;
             }
@@ -173,8 +183,10 @@ public class CameraZoomScript : MonoBehaviour
         float currentZoom = mainCamera.orthographicSize;
         float targetZoom = maxZoom;
 
-        while(elapsed < duration)
+        while (elapsed < duration)
         {
+            if (GameManagerScript.isGameOver) yield break;
+
             elapsed += Time.unscaledDeltaTime;
             mainCamera.orthographicSize = Mathf.Lerp(currentZoom, targetZoom, elapsed / duration);
             screenBoundriesScript.RecalculateBounds();

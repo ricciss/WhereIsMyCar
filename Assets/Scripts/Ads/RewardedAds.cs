@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
@@ -15,7 +15,7 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     void Awake()
     {
         _adUnitId = _androidAdUnitId;
-        if(flyingObjectManager == null)
+        if (flyingObjectManager == null)
             flyingObjectManager = FindFirstObjectByType<FlyingObjectManager>();
     }
 
@@ -36,10 +36,10 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    
+
 
     public void OnUnityAdsAdLoaded(string placementId)
     {
@@ -51,7 +51,18 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
 
     public void ShowAd()
     {
-        //Velak japaslepj banner ad
+        // Ja banner reklāma ir atvērta, paslēpjam to uz reward reklāmas laiku
+        if (BannerAd.IsShown)
+        {
+            BannerAd banner = (AdManager.Instance != null) ? AdManager.Instance.bannerAd : null;
+            if (banner == null)
+                banner = FindFirstObjectByType<BannerAd>();
+
+            if (banner != null)
+                banner.HideBannerAd();
+            else
+                Advertisement.Banner.Hide();
+        }
 
         _rewardedAdButton.interactable = false;
         Advertisement.Show(_adUnitId, this);
@@ -82,12 +93,13 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
 
     public void OnUnityAdsShowClick(string placementId)
     {
-        Debug.Log("User clicked on rewarded ad: "+ placementId);
+        Debug.Log("User clicked on rewarded ad: " + placementId);
     }
 
     public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
     {
-        if (placementId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED)){
+        if (placementId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
+        {
             Debug.Log("Rewarded ad completed!");
             flyingObjectManager.DestroyAllFlyingObjects();
             _rewardedAdButton.interactable = false;

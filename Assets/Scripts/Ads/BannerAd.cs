@@ -1,3 +1,4 @@
+﻿using System;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
@@ -10,6 +11,10 @@ public class BannerAd : MonoBehaviour
     [SerializeField] Button _bannerButton;
     public bool isBannerVisible = false;
 
+    // Citi skripti (piem. BannerUIShifter) var klausīties, kad baneris parādās / pazūd
+    public static bool IsShown { get; private set; }
+    public static event Action<bool> OnBannerVisibilityChanged;
+
     [SerializeField] BannerPosition bannerPosition = BannerPosition.BOTTOM_CENTER;
     void Awake()
     {
@@ -19,7 +24,7 @@ public class BannerAd : MonoBehaviour
 
     public void LoadBanner()
     {
-        if(!Advertisement.isInitialized)
+        if (!Advertisement.isInitialized)
         {
             Debug.Log("Tried to load banner ad before Unity ads was initialized");
             return;
@@ -72,12 +77,16 @@ public class BannerAd : MonoBehaviour
     {
         Debug.Log("Banner ad is hidden! " + _adUnitId);
         isBannerVisible = false;
+        IsShown = false;
+        OnBannerVisibilityChanged?.Invoke(false);
     }
 
     void OnBannerShown()
     {
         Debug.Log("Banner ad is visible! " + _adUnitId);
         isBannerVisible = true;
+        IsShown = true;
+        OnBannerVisibilityChanged?.Invoke(true);
     }
 
 

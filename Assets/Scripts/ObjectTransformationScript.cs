@@ -13,6 +13,14 @@ public class ObjectTransformationScript : MonoBehaviour
 
     private void Update()
     {
+        // Spēle beigusies - mašīnu vairs nevar griezt, mērogot vai apgriezt
+        if (GameManagerScript.isGameOver)
+        {
+            rotateCW = rotateCCW = scaleUpY = scaleDownY = scaleUpX = scaleDownX = false;
+            isTransforming = false;
+            return;
+        }
+
         // Space darbojas uz datora (testēšanai), uz telefona izmanto FlipButton
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -71,6 +79,8 @@ public class ObjectTransformationScript : MonoBehaviour
     // ---------- Flip (parasta Button, OnClick) ----------
     public void FlipObject()
     {
+        if (GameManagerScript.isGameOver) return;
+
         if (GameObjectScript.lastDragged == null)
         {
             return;

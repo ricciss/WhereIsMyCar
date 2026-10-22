@@ -55,6 +55,9 @@ public class FlyingObjectControllerScript : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        // Spēle beigusies - viss iesaldēts, arī bumbas nereaģē uz pieskārienu
+        if (GameManagerScript.isGameOver) return;
+
         float waveOffset = Mathf.Sin(Time.time * waveFrequency) * waveAmplitude;
         rectTransform.anchoredPosition +=
             new Vector2(-speed * Time.deltaTime, waveOffset * Time.deltaTime);
