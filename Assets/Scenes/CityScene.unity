@@ -1079,6 +1079,7 @@ GameObject:
   - component: {fileID: 295391762}
   - component: {fileID: 295391765}
   - component: {fileID: 295391764}
+  - component: {fileID: 295391766}
   m_Layer: 0
   m_Name: AdsScriptHolder
   m_TagString: Untagged
@@ -1144,9 +1145,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adsInitializer: {fileID: 295391761}
   interstitialAd: {fileID: 295391762}
-  turnOffInterstitialAds: 1
+  turnOffInterstitialAds: 0
   rewardedAds: {fileID: 295391765}
   turnOffRewardedAds: 0
+  bannerAd: {fileID: 295391766}
+  turnOffBannerAds: 0
 --- !u!114 &295391764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1174,6 +1177,22 @@ MonoBehaviour:
   _androidAdUnitId: BP_Rewarded_Android
   _rewardedAdButton: {fileID: 722292375}
   flyingObjectManager: {fileID: 295391764}
+--- !u!114 &295391766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295391759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01bdf8bb53d5baf4486032ca1f060be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _AndroidAdUnitId: BP_Banner_Android
+  _bannerButton: {fileID: 1091800552}
+  isBannerVisible: 0
+  bannerPosition: 4
 --- !u!1 &347034112
 GameObject:
   m_ObjectHideFlags: 0
@@ -4275,7 +4294,7 @@ GameObject:
   - component: {fileID: 1091800552}
   m_Layer: 0
   m_Name: BannerAd
-  m_TagString: Untagged
+  m_TagString: BannerAdButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
