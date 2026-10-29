@@ -44,6 +44,10 @@ public class HanoiGameManager : MonoBehaviour
     public Image victoryImage;
     public TMP_Text victoryTimeText;
 
+    [Header("Rewarded reklāma")]
+    [Tooltip("Cik sekundes tiek noņemtas no laika, kad rewarded reklāma noskatīta līdz galam")]
+    public float rewardedTimeBonus = 30f;
+
     [Header("Uzvaras paneļa attēli")]
     public Sprite victory1Star;
     public Sprite victory2Stars;
@@ -109,6 +113,25 @@ public class HanoiGameManager : MonoBehaviour
             discs[i].currentPeg = pegs[0];
             SnapToPeg(discs[i]);
         }
+    }
+
+    void OnEnable()
+    {
+        RewardedAds.OnRewardEarned += HandleRewardEarned;
+    }
+
+    void OnDisable()
+    {
+        RewardedAds.OnRewardEarned -= HandleRewardEarned;
+    }
+
+    // Rewarded reklāma noskatīta līdz galam - noņem sekundes no laika
+    void HandleRewardEarned()
+    {
+        if (IsFinished) return;
+
+        elapsedTime = Mathf.Max(0f, elapsedTime - rewardedTimeBonus);
+        if (timerText != null) timerText.text = FormatTime(elapsedTime);
     }
 
     void Update()
@@ -263,6 +286,11 @@ public class HanoiGameManager : MonoBehaviour
     public void RestartGame()
     {
         Time.timeScale = 1f;
+
+        // Restarts PĒC uzvaras - reklāmu nerāda. Restarts spēles laikā - reklāma parādās kā parasti.
+        if (IsFinished && AdManager.Instance != null)
+            AdManager.Instance.SkipNextSceneInterstitial();
+
         if (string.IsNullOrEmpty(sceneNameToReload))
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         else

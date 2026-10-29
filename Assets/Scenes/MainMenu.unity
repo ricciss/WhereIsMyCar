@@ -666,6 +666,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 77865547}
+  - {fileID: 465113470}
   - {fileID: 379735328}
   - {fileID: 1861236876}
   - {fileID: 1718236960}
@@ -681,6 +682,41 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &465113469
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 465113470}
+  m_Layer: 0
+  m_Name: Ads
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &465113470
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 465113469}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 449836282}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 90, y: -190}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &625358758
 GameObject:
   m_ObjectHideFlags: 0
@@ -1736,6 +1772,140 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1490312546}
   m_CullTransparentMesh: 1
+--- !u!1 &1574464670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1574464677}
+  - component: {fileID: 1574464676}
+  - component: {fileID: 1574464675}
+  - component: {fileID: 1574464674}
+  - component: {fileID: 1574464673}
+  - component: {fileID: 1574464672}
+  - component: {fileID: 1574464671}
+  m_Layer: 0
+  m_Name: AdsScriptHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1574464671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01bdf8bb53d5baf4486032ca1f060be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _AndroidAdUnitId: BP_Banner_Android
+  _bannerButton: {fileID: 0}
+  isBannerVisible: 1
+  autoShowScenes:
+  - MainMenu
+  - HanoiScene
+  bannerPosition: 4
+--- !u!114 &1574464672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575ccab79fe945c47a023a058c56c09e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1574464673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dd619cc55cecfe40be47bcf56466d82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _androidAdUnitId: BP_Rewarded_Android
+  _rewardedAdButton: {fileID: 0}
+  flyingObjectManager: {fileID: 1574464672}
+--- !u!114 &1574464674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71469a41a3cff9b4a851a30d4483b735, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _androidAdUnitId: BP_Interstitial_Android
+  isReady: 0
+  _interstitialAdButton: {fileID: 0}
+  slowMotionSceneName: CityScene
+--- !u!114 &1574464675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55bb0fb14294a5b479173337c896374f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _androidGameId: 800388718
+  _testMode: 1
+--- !u!114 &1574464676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3812a8f1ea679644889d5b8b59f4403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adsInitializer: {fileID: 1574464675}
+  interstitialAd: {fileID: 1574464674}
+  turnOffInterstitialAds: 0
+  showInterstitialOnSceneChange: 1
+  minSecondsBetweenInterstitials: 0
+  rewardedAds: {fileID: 1574464673}
+  turnOffRewardedAds: 0
+  bannerAd: {fileID: 1574464671}
+  turnOffBannerAds: 0
+--- !u!4 &1574464677
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574464670}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 343.31058, y: 865.699, z: -1.2692659}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1718236959
 GameObject:
   m_ObjectHideFlags: 0
@@ -2245,3 +2415,4 @@ SceneRoots:
   - {fileID: 740755199}
   - {fileID: 1007219071}
   - {fileID: 22009815}
+  - {fileID: 1574464677}

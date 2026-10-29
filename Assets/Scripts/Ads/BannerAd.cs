@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Advertisements;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BannerAd : MonoBehaviour
@@ -10,6 +11,11 @@ public class BannerAd : MonoBehaviour
 
     [SerializeField] Button _bannerButton;
     public bool isBannerVisible = false;
+
+    [Header("Automātiska banera rādīšana")]
+    [Tooltip("Ainas, kurās baneris parādās pats, bez pogas spiešanas. Citās ainās tas tiek paslēpts.")]
+    [SerializeField] string[] autoShowScenes = { "MainMenu" };
+    private bool isLoaded = false;
 
     // Citi skripti (piem. BannerUIShifter) var klausīties, kad baneris parādās / pazūd
     public static bool IsShown { get; private set; }
@@ -42,7 +48,32 @@ public class BannerAd : MonoBehaviour
     void OnBannerLoaded()
     {
         Debug.Log("Banner ad Loaded!");
-        _bannerButton.interactable = true;
+        isLoaded = true;
+        if (_bannerButton != null)
+            _bannerButton.interactable = true;
+
+        // Ja šajā ainā baneris jārāda automātiski - parāda uzreiz pēc ielādes
+        ApplySceneRule(SceneManager.GetActiveScene().name);
+    }
+
+    // Parāda vai paslēpj banneri pēc tā, vai aina ir sarakstā autoShowScenes
+    public void ApplySceneRule(string sceneName)
+    {
+        bool shouldShow = System.Array.IndexOf(autoShowScenes, sceneName) >= 0;
+
+        if (shouldShow)
+        {
+            // Kamēr rāda pilnekrāna reklāmu, baneri nerāda - to atjaunos pēc reklāmas beigām
+            if (InterstitialAd.IsShowing)
+                return;
+
+            if (isLoaded && !isBannerVisible)
+                ShowBannerAd();
+        }
+        else if (isBannerVisible)
+        {
+            HideBannerAd();
+        }
     }
 
     void OnBannerError(string message)
@@ -94,6 +125,14 @@ public class BannerAd : MonoBehaviour
     public void HideBannerAd()
     {
         Advertisement.Banner.Hide();
+
+        // Karodziņu atjaunojam uzreiz, nevis gaidām hideCallback (tas var nenonākt)
+        if (isBannerVisible)
+        {
+            isBannerVisible = false;
+            IsShown = false;
+            OnBannerVisibilityChanged?.Invoke(false);
+        }
     }
 
     public void SetButton(Button button)

@@ -11,6 +11,9 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     [SerializeField] Button _rewardedAdButton;
     public FlyingObjectManager flyingObjectManager;
 
+    // Tiek izsaukts, kad reklāma noskatīta līdz galam. Katra aina (CityScene, Hanoi) uz to reaģē pati.
+    public static event System.Action OnRewardEarned;
+
 
     void Awake()
     {
@@ -45,7 +48,7 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     {
         Debug.Log("Rewarded ad Loaded: " + placementId);
 
-        if (placementId.Equals(_adUnitId))
+        if (placementId.Equals(_adUnitId) && _rewardedAdButton != null)
             _rewardedAdButton.interactable = true;
     }
 
@@ -64,7 +67,8 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
                 Advertisement.Banner.Hide();
         }
 
-        _rewardedAdButton.interactable = false;
+        if (_rewardedAdButton != null)
+            _rewardedAdButton.interactable = false;
         Advertisement.Show(_adUnitId, this);
     }
 
@@ -101,8 +105,11 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
         if (placementId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
         {
             Debug.Log("Rewarded ad completed!");
-            flyingObjectManager.DestroyAllFlyingObjects();
-            _rewardedAdButton.interactable = false;
+            OnRewardEarned?.Invoke();
+            if (flyingObjectManager != null)
+                flyingObjectManager.DestroyAllFlyingObjects();
+            if (_rewardedAdButton != null)
+                _rewardedAdButton.interactable = false;
             StartCoroutine(WaitAndLoadAd(10f));
         }
         Time.timeScale = 1f;

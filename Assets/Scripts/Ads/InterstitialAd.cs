@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
@@ -11,7 +12,13 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     string _adUnitId;
     public event Action OnInterstitialAdReady;
     public bool isReady = false;
+
+    // Patiesi, kamēr pilnekrāna reklāma tiek rādīta - baneri šajā laikā nerāda
+    public static bool IsShowing { get; private set; }
     [SerializeField] Button _interstitialAdButton;
+
+    [Tooltip("Tikai šajā ainā pēc reklāmas ieslēdzas lēnais laiks (30 s). Citās ainās laiks paliek normāls.")]
+    [SerializeField] string slowMotionSceneName = "CityScene";
 
     void Awake()
     {
@@ -21,7 +28,8 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
 
     private void Update()
     {
-        if(AdManager.Instance != null && AdManager.Instance.interstitialAd != null)
+        // Pogas var nebūt (piem., MainMenu vai Hanoi ainā) - tad nekas nav jādara
+        if (_interstitialAdButton != null && AdManager.Instance != null && AdManager.Instance.interstitialAd != null)
         {
             _interstitialAdButton.interactable = AdManager.Instance.interstitialAd.isReady;
         }
@@ -35,7 +43,7 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
 
     public void ShowInterstitial()
     {
-        if(AdManager.Instance.interstitialAd != null && AdManager.Instance.interstitialAd.isReady)
+        if (AdManager.Instance.interstitialAd != null && AdManager.Instance.interstitialAd.isReady)
         {
             Debug.Log("Showing interstitial ad manually!");
             ShowAd();
@@ -51,9 +59,13 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     {
         if (isReady)
         {
-            if (AdManager.Instance.bannerAd.isBannerVisible)
+            // Banneri paslēpjam VIENMĒR (nepaļaujoties uz karodziņu), lai tas nekad nebūtu virs pilnekrāna reklāmas
+            if (AdManager.Instance != null && AdManager.Instance.bannerAd != null)
                 AdManager.Instance.bannerAd.HideBannerAd();
-            
+            else
+                Advertisement.Banner.Hide();
+
+            IsShowing = true;
             Advertisement.Show(_adUnitId, this);
             isReady = false;
         }
@@ -78,8 +90,9 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     public void OnUnityAdsAdLoaded(string placementId)
     {
         Debug.Log("Interstitial ad loaded succesfully!");
-        _interstitialAdButton.interactable = true;
-        isReady = true;
+        isReady = true;   // vispirms atzīmējam, ka reklāma gatava (neatkarīgi no pogas)
+        if (_interstitialAdButton != null)
+            _interstitialAdButton.interactable = true;
         OnInterstitialAdReady?.Invoke();
     }
 
@@ -94,14 +107,28 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
         Debug.Log("Interstitial ad clicked!");
     }
 
+    // Pēc reklāmas atjauno banneri tajās ainās, kur tam jābūt redzamam (piem., MainMenu)
+    private void RestoreBanner()
+    {
+        IsShowing = false;
+
+        if (AdManager.Instance != null && AdManager.Instance.bannerAd != null)
+            AdManager.Instance.bannerAd.ApplySceneRule(SceneManager.GetActiveScene().name);
+    }
+
     public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
     {
-        if(showCompletionState == UnityAdsShowCompletionState.COMPLETED)
+        RestoreBanner();
+        if (showCompletionState == UnityAdsShowCompletionState.COMPLETED)
         {
             Debug.Log("Interstitial ad completed sucesfully!");
-            StartCoroutine(SlowDownTimeTemporarily(30f));
+            if (SceneManager.GetActiveScene().name == slowMotionSceneName)
+                StartCoroutine(SlowDownTimeTemporarily(30f));
+            else
+                Time.timeScale = 1f;
             LoadAd();
-        } else
+        }
+        else
         {
             Debug.LogWarning($"Interstitial ad was not completed: {showCompletionState.ToString()}");
             Time.timeScale = 1f;
@@ -121,6 +148,7 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     public void OnUnityAdsShowFailure(string placementId, UnityAdsShowError error, string message)
     {
         Debug.LogError($"Failed to show interstitial ad: {error.ToString()} - {message}");
+        RestoreBanner();
         LoadAd();
     }
 
@@ -141,7 +169,7 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
         _interstitialAdButton.interactable = false;
     }
 
-   
+
 
 
 }
