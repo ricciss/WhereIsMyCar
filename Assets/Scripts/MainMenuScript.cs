@@ -7,6 +7,11 @@ public class MainMenuScript : MonoBehaviour
     [Tooltip("Precīzs spēles ainas nosaukums (jāsakrīt ar Build Settings sarakstā)")]
     public string gameSceneName = "CityScene";
 
+    [Tooltip("Bonus spēles aina (Hanojas tornis) - jāsakrīt ar Build Settings sarakstā")]
+    public string bonusSceneName = "HanoiScene";
+
+    private string sceneToLoad;
+
     [Header("Skaņa")]
     public AudioSource audioSource;   // ja tukšs, meklēs uz šī paša objekta
     public AudioClip clickSound;
@@ -21,6 +26,15 @@ public class MainMenuScript : MonoBehaviour
     // Piesaisti šo metodi "START" pogas OnClick() notikumam
     public void OnStartClicked()
     {
+        sceneToLoad = gameSceneName;
+        PlayClickSound();
+        Invoke(nameof(LoadGameScene), delayBeforeAction);
+    }
+
+    // Piesaisti šo metodi "BONUS GAME" pogas OnClick() notikumam
+    public void OnBonusClicked()
+    {
+        sceneToLoad = bonusSceneName;
         PlayClickSound();
         Invoke(nameof(LoadGameScene), delayBeforeAction);
     }
@@ -40,7 +54,7 @@ public class MainMenuScript : MonoBehaviour
 
     void LoadGameScene()
     {
-        SceneManager.LoadScene(gameSceneName);
+        SceneManager.LoadScene(sceneToLoad);
     }
 
     void QuitGame()
