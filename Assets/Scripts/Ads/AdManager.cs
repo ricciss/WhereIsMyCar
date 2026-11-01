@@ -36,12 +36,12 @@ public class AdManager : MonoBehaviour
 
     private void Awake()
     {
-        if (adsInitializer == null)
+        if(adsInitializer == null)
         {
             adsInitializer = FindFirstObjectByType<AdsInitializer>();
         }
 
-        if (Instance != null && Instance != this)
+        if(Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
             return;
@@ -155,9 +155,10 @@ public class AdManager : MonoBehaviour
         else if (skipInterstitialNow)
             Debug.Log("Interstitial skipped for this scene change (restart after victory).");
 
-        // Baneris: automātiski parādās tajās ainās, kas norādītas BannerAd.autoShowScenes, citās tiek paslēpts
+        // Baneris: katrā jaunā ainā tiek iznīcināts un ielādēts no jauna ar šīs ainas pozīciju.
+        // Pēc ielādes tas parādās pats (MainMenu, Hanoi) vai gaida pogu (CityScene).
         if (!turnOffBannerAds && bannerAd != null)
-            bannerAd.ApplySceneRule(scene.name);
+            bannerAd.ReloadForScene();
 
         // 2) Ielādē reklāmas nākamajai reizei / atjauno pogas jaunajā ainā
         if (!turnOffInterstitialAds && !shownNow && interstitialAd != null && !interstitialAd.isReady)
@@ -166,8 +167,6 @@ public class AdManager : MonoBehaviour
         if (!turnOffRewardedAds && rewardedAds != null)
             rewardedAds.LoadAd();
 
-        if (!turnOffBannerAds && bannerAd != null)
-            bannerAd.LoadBanner();
     }
 
     private bool TryShowInterstitial()

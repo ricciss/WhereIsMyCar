@@ -14,19 +14,56 @@ public class BannerAd : MonoBehaviour
 
     [Header("Automātiska banera rādīšana")]
     [Tooltip("Ainas, kurās baneris parādās pats, bez pogas spiešanas. Citās ainās tas tiek paslēpts.")]
-    [SerializeField] string[] autoShowScenes = { "MainMenu" };
-    private bool isLoaded = false;
+    [SerializeField] string[] autoShowScenes = { "MainMenu", "HanoiScene" };
+
+    [System.Serializable]
+    public class ScenePosition
+    {
+        public string sceneName;
+        public BannerPosition position;
+    }
+
+    [Header("Banera pozīcija pa ainām")]
+    [Tooltip("Ainām, kas nav sarakstā, tiek izmantota pozīcija 'Banner Position' zemāk")]
+    [SerializeField] ScenePosition[] scenePositions =
+    {
+        new ScenePosition { sceneName = "MainMenu",   position = BannerPosition.BOTTOM_CENTER },
+        new ScenePosition { sceneName = "HanoiScene", position = BannerPosition.TOP_CENTER }
+    };
+    [SerializeField] BannerPosition bannerPosition = BannerPosition.BOTTOM_CENTER;
 
     // Citi skripti (piem. BannerUIShifter) var klausīties, kad baneris parādās / pazūd
     public static bool IsShown { get; private set; }
     public static event Action<bool> OnBannerVisibilityChanged;
 
-    [SerializeField] BannerPosition bannerPosition = BannerPosition.BOTTOM_CENTER;
+    private bool isLoaded = false;
+    private bool isLoading = false;
+    public bool IsLoaded { get { return isLoaded; } }
+
     void Awake()
     {
         _adUnitId = _AndroidAdUnitId;
         Advertisement.Banner.SetPosition(bannerPosition);
     }
+
+    // ---------------- Pozīcija ----------------
+
+    BannerPosition GetPositionForActiveScene()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (scenePositions != null)
+        {
+            foreach (ScenePosition sp in scenePositions)
+            {
+                if (sp.sceneName == sceneName)
+                    return sp.position;
+            }
+        }
+        return bannerPosition;
+    }
+
+    // ---------------- Ielāde ----------------
 
     public void LoadBanner()
     {
@@ -35,6 +72,12 @@ public class BannerAd : MonoBehaviour
             Debug.Log("Tried to load banner ad before Unity ads was initialized");
             return;
         }
+
+        if (isLoading) return;
+        isLoading = true;
+
+        // Pozīcija tiek uzstādīta PIRMS ielādes
+        Advertisement.Banner.SetPosition(GetPositionForActiveScene());
 
         BannerLoadOptions bannerOptions = new BannerLoadOptions
         {
@@ -45,10 +88,27 @@ public class BannerAd : MonoBehaviour
         Advertisement.Banner.Load(_adUnitId, bannerOptions);
     }
 
+    // Katrā jaunā ainā: iznīcina veco banneri un ielādē jaunu ar šīs ainas pozīciju
+    public void ReloadForScene()
+    {
+        CancelInvoke(nameof(LoadBanner));
+        Advertisement.Banner.Hide(true);   // true = pilnībā iznīcina veco banneri
+        SetVisible(false);
+
+        isLoaded = false;
+        isLoading = false;
+        if (_bannerButton != null)
+            _bannerButton.interactable = false;
+
+        LoadBanner();
+    }
+
     void OnBannerLoaded()
     {
         Debug.Log("Banner ad Loaded!");
+        isLoading = false;
         isLoaded = true;
+
         if (_bannerButton != null)
             _bannerButton.interactable = true;
 
@@ -56,10 +116,20 @@ public class BannerAd : MonoBehaviour
         ApplySceneRule(SceneManager.GetActiveScene().name);
     }
 
+    void OnBannerError(string message)
+    {
+        Debug.Log($"Banner error: {message}");
+        isLoading = false;
+        CancelInvoke(nameof(LoadBanner));
+        Invoke(nameof(LoadBanner), 5f);   // mēģina vēlreiz pēc 5 sekundēm
+    }
+
+    // ---------------- Rādīšana / slēpšana ----------------
+
     // Parāda vai paslēpj banneri pēc tā, vai aina ir sarakstā autoShowScenes
     public void ApplySceneRule(string sceneName)
     {
-        bool shouldShow = System.Array.IndexOf(autoShowScenes, sceneName) >= 0;
+        bool shouldShow = Array.IndexOf(autoShowScenes, sceneName) >= 0;
 
         if (shouldShow)
         {
@@ -76,27 +146,46 @@ public class BannerAd : MonoBehaviour
         }
     }
 
-    void OnBannerError(string message)
+    // Stāvokli maina TIKAI mūsu pašu izsaukumi, nevis vēlu atnākošie Unity callbacki
+    void SetVisible(bool visible)
     {
-        Debug.Log($"Banner error: {message}");
-        LoadBanner();
+        if (isBannerVisible == visible) return;
+
+        isBannerVisible = visible;
+        IsShown = visible;
+        OnBannerVisibilityChanged?.Invoke(visible);
     }
 
     public void ShowBannerAd()
     {
         if (isBannerVisible)
-            HideBannerAd();
-
-        else
         {
-            BannerOptions bannerOptions = new BannerOptions
-            {
-                clickCallback = OnBannerClicked,
-                hideCallback = OnBannerHidden,
-                showCallback = OnBannerShown
-            };
-            Advertisement.Banner.Show(_adUnitId, bannerOptions);
+            HideBannerAd();
+            return;
         }
+
+        if (!isLoaded)
+        {
+            Debug.Log("Banner not loaded yet, cannot show.");
+            return;
+        }
+
+        Advertisement.Banner.SetPosition(GetPositionForActiveScene());
+
+        BannerOptions bannerOptions = new BannerOptions
+        {
+            clickCallback = OnBannerClicked,
+            hideCallback = OnBannerHidden,
+            showCallback = OnBannerShown
+        };
+        Advertisement.Banner.Show(_adUnitId, bannerOptions);
+        SetVisible(true);
+    }
+
+    public void HideBannerAd()
+    {
+        Advertisement.Banner.Hide();
+        SetVisible(false);
     }
 
     void OnBannerClicked()
@@ -107,33 +196,14 @@ public class BannerAd : MonoBehaviour
     void OnBannerHidden()
     {
         Debug.Log("Banner ad is hidden! " + _adUnitId);
-        isBannerVisible = false;
-        IsShown = false;
-        OnBannerVisibilityChanged?.Invoke(false);
     }
 
     void OnBannerShown()
     {
         Debug.Log("Banner ad is visible! " + _adUnitId);
-        isBannerVisible = true;
-        IsShown = true;
-        OnBannerVisibilityChanged?.Invoke(true);
     }
 
-
-
-    public void HideBannerAd()
-    {
-        Advertisement.Banner.Hide();
-
-        // Karodziņu atjaunojam uzreiz, nevis gaidām hideCallback (tas var nenonākt)
-        if (isBannerVisible)
-        {
-            isBannerVisible = false;
-            IsShown = false;
-            OnBannerVisibilityChanged?.Invoke(false);
-        }
-    }
+    // ---------------- Poga (CityScene) ----------------
 
     public void SetButton(Button button)
     {
@@ -143,6 +213,6 @@ public class BannerAd : MonoBehaviour
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(ShowBannerAd);
         _bannerButton = button;
-        _bannerButton.interactable = false;
+        _bannerButton.interactable = isLoaded;
     }
 }

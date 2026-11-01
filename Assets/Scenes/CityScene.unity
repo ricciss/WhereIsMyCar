@@ -1131,6 +1131,7 @@ MonoBehaviour:
   _androidAdUnitId: BP_Interstitial_Android
   isReady: 0
   _interstitialAdButton: {fileID: 1379029839}
+  slowMotionSceneName: CityScene
 --- !u!114 &295391763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1146,6 +1147,8 @@ MonoBehaviour:
   adsInitializer: {fileID: 295391761}
   interstitialAd: {fileID: 295391762}
   turnOffInterstitialAds: 0
+  showInterstitialOnSceneChange: 1
+  minSecondsBetweenInterstitials: 0
   rewardedAds: {fileID: 295391765}
   turnOffRewardedAds: 0
   bannerAd: {fileID: 295391766}
@@ -1192,6 +1195,15 @@ MonoBehaviour:
   _AndroidAdUnitId: BP_Banner_Android
   _bannerButton: {fileID: 1091800552}
   isBannerVisible: 0
+  autoShowScenes:
+  - MainMenu
+  scenePositions:
+  - sceneName: MainMenu
+    position: 4
+  - sceneName: HanoiScene
+    position: 1
+  - sceneName: CityScene
+    position: 2
   bannerPosition: 2
 --- !u!1 &347034112
 GameObject:

@@ -1812,7 +1812,12 @@ MonoBehaviour:
   autoShowScenes:
   - MainMenu
   - HanoiScene
-  bannerPosition: 4
+  scenePositions:
+  - sceneName: MainMenu
+    position: 4
+  - sceneName: HanoiScene
+    position: 1
+  bannerPosition: 2
 --- !u!114 &1574464672
 MonoBehaviour:
   m_ObjectHideFlags: 0
