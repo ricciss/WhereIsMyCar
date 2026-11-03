@@ -25,7 +25,8 @@ public class BannerAd : MonoBehaviour
 
     [Header("Banera pozīcija pa ainām")]
     [Tooltip("Ainām, kas nav sarakstā, tiek izmantota pozīcija 'Banner Position' zemāk")]
-    [SerializeField] ScenePosition[] scenePositions =
+    [SerializeField]
+    ScenePosition[] scenePositions =
     {
         new ScenePosition { sceneName = "MainMenu",   position = BannerPosition.BOTTOM_CENTER },
         new ScenePosition { sceneName = "HanoiScene", position = BannerPosition.TOP_CENTER }
@@ -180,6 +181,13 @@ public class BannerAd : MonoBehaviour
         };
         Advertisement.Banner.Show(_adUnitId, bannerOptions);
         SetVisible(true);
+    }
+
+    // Pēc pilnekrāna reklāmas (piem., reward) atjauno banneri, ja tas bija redzams pirms tās
+    public void RestoreAfterFullscreenAd()
+    {
+        if (isLoaded && !isBannerVisible)
+            ShowBannerAd();
     }
 
     public void HideBannerAd()

@@ -14,6 +14,13 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     // Tiek izsaukts, kad reklāma noskatīta līdz galam. Katra aina (CityScene, Hanoi) uz to reaģē pati.
     public static event System.Action OnRewardEarned;
 
+    // Ja true - reward reklāmu vairs nevar skatīties (poga paliek izslēgta). Hanoi aina to ieslēdz pēc noskatīšanās
+    // un noņem, kad sākas jauna kārta vai aina tiek pamesta.
+    public static bool RewardLocked { get; set; }
+
+    // Vai baneris bija redzams, kad sākās reward reklāma (to atjaunojam pēc reklāmas beigām)
+    private bool bannerWasShown = false;
+
 
     void Awake()
     {
@@ -49,13 +56,22 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
         Debug.Log("Rewarded ad Loaded: " + placementId);
 
         if (placementId.Equals(_adUnitId) && _rewardedAdButton != null)
-            _rewardedAdButton.interactable = true;
+            _rewardedAdButton.interactable = !RewardLocked;
     }
 
     public void ShowAd()
     {
+        if (RewardLocked)
+        {
+            Debug.Log("Rewarded ad already used - locked.");
+            if (_rewardedAdButton != null)
+                _rewardedAdButton.interactable = false;
+            return;
+        }
+
         // Ja banner reklāma ir atvērta, paslēpjam to uz reward reklāmas laiku
-        if (BannerAd.IsShown)
+        bannerWasShown = BannerAd.IsShown;
+        if (bannerWasShown)
         {
             BannerAd banner = (AdManager.Instance != null) ? AdManager.Instance.bannerAd : null;
             if (banner == null)
@@ -87,6 +103,7 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     public void OnUnityAdsShowFailure(string placementId, UnityAdsShowError error, string message)
     {
         Debug.Log($"Error showing rewarded ad: {placementId} : {error.ToString()} - {message}");
+        RestoreBanner();
         StartCoroutine(WaitAndLoadAd(10f));
     }
 
@@ -100,8 +117,25 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
         Debug.Log("User clicked on rewarded ad: " + placementId);
     }
 
+    // Pēc reward reklāmas atjauno banneri, ja tas bija redzams pirms reklāmas
+    private void RestoreBanner()
+    {
+        if (!bannerWasShown) return;
+        bannerWasShown = false;
+
+        if (InterstitialAd.IsShowing) return;
+
+        BannerAd banner = (AdManager.Instance != null) ? AdManager.Instance.bannerAd : null;
+        if (banner == null)
+            banner = FindFirstObjectByType<BannerAd>();
+
+        if (banner != null)
+            banner.RestoreAfterFullscreenAd();
+    }
+
     public void OnUnityAdsShowComplete(string placementId, UnityAdsShowCompletionState showCompletionState)
     {
+        RestoreBanner();
         if (placementId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
         {
             Debug.Log("Rewarded ad completed!");
@@ -110,7 +144,8 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
                 flyingObjectManager.DestroyAllFlyingObjects();
             if (_rewardedAdButton != null)
                 _rewardedAdButton.interactable = false;
-            StartCoroutine(WaitAndLoadAd(10f));
+            if (!RewardLocked)
+                StartCoroutine(WaitAndLoadAd(10f));
         }
         Time.timeScale = 1f;
     }

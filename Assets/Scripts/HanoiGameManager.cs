@@ -74,6 +74,7 @@ public class HanoiGameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         IsFinished = false;
+        RewardedAds.RewardLocked = false;   // jauna kārta - reward reklāmu atkal drīkst noskatīties vienu reizi
 
         if (victoryPanel != null) victoryPanel.SetActive(false);
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
@@ -125,10 +126,19 @@ public class HanoiGameManager : MonoBehaviour
         RewardedAds.OnRewardEarned -= HandleRewardEarned;
     }
 
+    void OnDestroy()
+    {
+        // Pametot Hanoi ainu, bloķēšana nedrīkst palikt spēkā citās ainās (piem., CityScene)
+        RewardedAds.RewardLocked = false;
+    }
+
     // Rewarded reklāma noskatīta līdz galam - noņem sekundes no laika
     void HandleRewardEarned()
     {
         if (IsFinished) return;
+
+        // Reklāmu drīkst noskatīties tikai vienu reizi kārtā
+        RewardedAds.RewardLocked = true;
 
         elapsedTime = Mathf.Max(0f, elapsedTime - rewardedTimeBonus);
         if (timerText != null) timerText.text = FormatTime(elapsedTime);
